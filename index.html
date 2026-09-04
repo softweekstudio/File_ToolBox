@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft Week File Toolbox</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background: #f5f1e8;
+  color: #222;
+}
+
+.app {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+  padding: 24px 16px 40px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.logo { font-size: 42px; margin-bottom: 8px; }
+h1 { margin: 0; font-size: 28px; }
+.subtitle { margin: 8px 0 0; color: #666; font-size: 14px; }
+
+.dashboard, .tool-page {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.08);
+}
+
+.tool-button, .action-button {
+  width: 100%;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.tool-button:hover, .action-button:hover {
+  box-shadow: 0 5px 14px rgba(0,0,0,.08);
+}
+
+.tool-icon { font-size: 28px; display: block; margin-bottom: 10px; }
+.tool-title { font-weight: 700; display: block; margin-bottom: 5px; }
+.tool-description { font-size: 13px; color: #666; }
+
+.hidden { display: none; }
+
+.back-button {
+  border: 0;
+  background: transparent;
+  padding: 6px 0 18px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.tool-page h2 { margin: 0 0 18px; }
+
+textarea {
+  width: 100%;
+  min-height: 420px;
+  resize: vertical;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font: 16px/1.5 Arial, sans-serif;
+  outline: none;
+}
+
+textarea:focus { border-color: #888; }
+
+.convert-button {
+  margin-top: 14px;
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background: #222;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.status {
+  min-height: 20px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #666;
+}
+
+
+.image-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.action-button {
+  text-align: center;
+  min-height: 52px;
+}
+
+.image-preview {
+  min-height: 120px;
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+  padding: 14px;
+  color: #777;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.preview-item {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 6px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.preview-item img {
+  display: block;
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 7px;
+}
+
+.preview-name {
+  font-size: 11px;
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.format-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.format-select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+
+.clear-button {
+  margin-top: 10px;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background: #fafafa;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.download-link {
+  display: block;
+  margin-top: 12px;
+  padding: 13px;
+  border-radius: 12px;
+  background: #f5f1e8;
+  color: #222;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  .image-actions { grid-template-columns: 1fr; }
+}
+
+
+.video-preview-name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  margin-bottom: 6px;
+}
+
+.video-preview-meta {
+  color: #666;
+  font-size: 13px;
+}
+
+footer {
+  text-align: center;
+  margin-top: 22px;
+  color: #888;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">🧰</div>
+  <h1>Soft Week File Toolbox</h1>
+  <p class="subtitle">Choose a tool to get started</p>
+</header>
+
+<section id="dashboard" class="dashboard">
+  <button id="textToPdfButton" class="tool-button" type="button">
+    <span class="tool-icon">📄</span>
+    <span class="tool-title">Text to PDF</span>
+    <span class="tool-description">Write as much text as you want and convert it to PDF.</span>
+  </button>
+
+  <button id="imageConverterButton" class="tool-button" type="button">
+    <span class="tool-icon">🖼️</span>
+    <span class="tool-title">Image Converter</span>
+    <span class="tool-description">Convert images to different formats.</span>
+  </button>
+
+  <button id="videoToAudioButton" class="tool-button" type="button">
+    <span class="tool-icon">🎵</span>
+    <span class="tool-title">Video to Audio</span>
+    <span class="tool-description">Extract audio from a video file.</span>
+  </button>
+</section>
+
+<section id="textToPdfPage" class="tool-page hidden">
+  <button id="backButton" class="back-button" type="button">← Back to Dashboard</button>
+
+  <h2>📄 Text to PDF</h2>
+
+  <textarea id="textInput" placeholder="Write your text here..."></textarea>
+
+  <button id="clearButton" class="convert-button" type="button">
+    Clear
+  </button>
+
+  <button id="convertButton" class="convert-button" type="button">
+    Convert to PDF
+  </button>
+
+  <div id="status" class="status" aria-live="polite"></div>
+</section>
+
+
+<section id="imageConverterPage" class="tool-page hidden">
+  <button id="imageBackButton" class="back-button" type="button">← Back to Dashboard</button>
+
+  <h2>🖼️ Image Converter</h2>
+
+  <div class="image-actions">
+    <button id="chooseImageButton" class="action-button" type="button">📁 Choose Image(s)</button>
+    <button id="takePhotoButton" class="action-button" type="button">📷 Take Photo</button>
+  </div>
+
+  <input id="imageFileInput" type="file" accept="image/*" multiple hidden>
+  <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+
+  <div id="imagePreview" class="image-preview">
+    No image selected.
+  </div>
+
+  <label class="format-label" for="formatSelect">Convert to</label>
+  <select id="formatSelect" class="format-select">
+    <option value="jpg">JPG / JPEG</option>
+    <option value="png">PNG</option>
+    <option value="webp">WebP</option>
+    <option value="pdf">PDF</option>
+  </select>
+
+  <button id="imageConvertButton" class="convert-button" type="button">Convert</button>
+  <button id="imageClearButton" class="clear-button" type="button">🧹 Clear</button>
+
+  <div id="imageStatus" class="status" aria-live="polite"></div>
+  <div id="downloadArea"></div>
+</section>
+
+
+<section id="videoToAudioPage" class="tool-page hidden">
+  <button id="videoBackButton" class="back-button" type="button">← Back to Dashboard</button>
+
+  <h2>🎵 Video to Audio</h2>
+
+  <button id="chooseVideoButton" class="action-button" type="button">📁 Choose Video</button>
+  <input id="videoFileInput" type="file" accept="video/*" hidden>
+
+  <div id="videoInfo" class="image-preview">No video selected.</div>
+
+  <div class="format-label">Original audio</div>
+  <div class="image-preview">The audio is extracted without re-encoding. The original audio codec is preserved.</div>
+
+  <button id="extractAudioButton" class="convert-button" type="button">Extract Original Audio</button>
+  <button id="videoClearButton" class="clear-button" type="button">🧹 Clear</button>
+
+  <div id="videoStatus" class="status" aria-live="polite"></div>
+  <div id="audioDownloadArea"></div>
+</section>
+
+<footer>Soft Week Studio</footer>
+
+</div>
+
+<script>
+(function () {
+  const dashboard = document.getElementById("dashboard");
+  const textPage = document.getElementById("textToPdfPage");
+  const openButton = document.getElementById("textToPdfButton");
+  const backButton = document.getElementById("backButton");
+  const textInput = document.getElementById("textInput");
+  const clearButton = document.getElementById("clearButton");
+  const convertButton = document.getElementById("convertButton");
+  const status = document.getElementById("status");
+  const imageConverterButton = document.getElementById("imageConverterButton");
+  const imageConverterPage = document.getElementById("imageConverterPage");
+  const imageBackButton = document.getElementById("imageBackButton");
+  const chooseImageButton = document.getElementById("chooseImageButton");
+  const takePhotoButton = document.getElementById("takePhotoButton");
+  const imageFileInput = document.getElementById("imageFileInput");
+  const cameraInput = document.getElementById("cameraInput");
+  const imagePreview = document.getElementById("imagePreview");
+  const imageConvertButton = document.getElementById("imageConvertButton");
+  const imageClearButton = document.getElementById("imageClearButton");
+  const formatSelect = document.getElementById("formatSelect");
+  const imageStatus = document.getElementById("imageStatus");
+  const downloadArea = document.getElementById("downloadArea");
+
+  let selectedImages = [];
+
+
+  const videoToAudioButton = document.getElementById("videoToAudioButton");
+  const videoToAudioPage = document.getElementById("videoToAudioPage");
+  const videoBackButton = document.getElementById("videoBackButton");
+  const chooseVideoButton = document.getElementById("chooseVideoButton");
+  const videoFileInput = document.getElementById("videoFileInput");
+  const videoInfo = document.getElementById("videoInfo");
+  const extractAudioButton = document.getElementById("extractAudioButton");
+  const videoClearButton = document.getElementById("videoClearButton");
+  const videoStatus = document.getElementById("videoStatus");
+  const audioDownloadArea = document.getElementById("audioDownloadArea");
+
+  let selectedVideo = null;
+
+  function updateThreadStatus() {
+    const isolated = window.crossOriginIsolated === true && typeof SharedArrayBuffer !== "undefined";
+    const existing = document.getElementById("threadStatus");
+    if (existing) existing.remove();
+    const box = document.createElement("div");
+    box.id = "threadStatus";
+    box.style.marginTop = "12px";
+    box.style.padding = "10px 12px";
+    box.style.borderRadius = "10px";
+    box.style.fontSize = "14px";
+    box.textContent = isolated ? "⚡ Multi-thread: ON" : "⚠️ Multi-thread: OFF — reload this GitHub Pages page once after installing the service worker.";
+    videoToAudioPage.appendChild(box);
+  }
+
+  if (location.protocol === "https:" && "serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" }).then(function () {
+      setTimeout(updateThreadStatus, 150);
+    }).catch(function () { updateThreadStatus(); });
+  } else {
+    updateThreadStatus();
+  }
+
+  videoToAudioButton.addEventListener("click", function () {
+    dashboard.classList.add("hidden");
+    textPage.classList.add("hidden");
+    imageConverterPage.classList.add("hidden");
+    videoToAudioPage.classList.remove("hidden");
+  });
+
+  videoBackButton.addEventListener("click", function () {
+    videoToAudioPage.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+  });
+
+  chooseVideoButton.addEventListener("click", function () {
+    videoFileInput.click();
+  });
+
+  videoFileInput.addEventListener("change", function () {
+    const file = videoFileInput.files && videoFileInput.files[0];
+
+    if (!file || !file.type.startsWith("video/")) {
+      selectedVideo = null;
+      videoInfo.textContent = "No valid video selected.";
+      return;
+    }
+
+    selectedVideo = file;
+    audioDownloadArea.innerHTML = "";
+    videoStatus.textContent = "";
+
+    videoInfo.innerHTML = "";
+    const name = document.createElement("div");
+    name.className = "video-preview-name";
+    name.textContent = file.name;
+
+    const meta = document.createElement("div");
+    meta.className = "video-preview-meta";
+    meta.textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+
+    videoInfo.appendChild(name);
+    videoInfo.appendChild(meta);
+  });
+
+  videoClearButton.addEventListener("click", function () {
+    selectedVideo = null;
+    videoFileInput.value = "";
+    videoInfo.textContent = "No video selected.";
+    videoStatus.textContent = "";
+    audioDownloadArea.innerHTML = "";
+  });
+
+  function downloadAudio(blob, filename) {
+    audioDownloadArea.innerHTML = "";
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.className = "download-link";
+    link.href = url;
+    link.download = filename;
+    link.textContent = "⬇️ Download " + filename;
+
+    audioDownloadArea.appendChild(link);
+
+    try {
+      link.click();
+    } catch (error) {
+      // The visible download link remains available.
+    }
+  }
+
+  function getVideoDuration(file) {
+    return new Promise(function (resolve, reject) {
+      const url = URL.createObjectURL(file);
+      const video = document.createElement("video");
+
+      video.preload = "metadata";
+
+      video.onloadedmetadata = function () {
+        const duration = Number.isFinite(video.duration) ? video.duration : 0;
+        URL.revokeObjectURL(url);
+        resolve(duration);
+      };
+
+      video.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error("The video could not be read by this browser."));
+      };
+
+      video.src = url;
+    });
+  }
+
+  function audioBufferToWavBlob(audioBuffer) {
+    const channelCount = audioBuffer.numberOfChannels;
+    const sampleRate = audioBuffer.sampleRate;
+    const frameCount = audioBuffer.length;
+    const bytesPerSample = 2;
+    const blockAlign = channelCount * bytesPerSample;
+    const dataSize = frameCount * blockAlign;
+
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+
+    function writeString(offset, value) {
+      for (let i = 0; i < value.length; i++) {
+        view.setUint8(offset + i, value.charCodeAt(i));
+      }
+    }
+
+    writeString(0, "RIFF");
+    view.setUint32(4, 36 + dataSize, true);
+    writeString(8, "WAVE");
+    writeString(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, channelCount, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, 16, true);
+    writeString(36, "data");
+    view.setUint32(40, dataSize, true);
+
+    const channels = [];
+    for (let channel = 0; channel < channelCount; channel++) {
+      channels.push(audioBuffer.getChannelData(channel));
+    }
+
+    let offset = 44;
+
+    for (let i = 0; i < frameCount; i++) {
+      for (let channel = 0; channel < channelCount; channel++) {
+        let sample = channels[channel][i];
+
+        if (sample > 1) sample = 1;
+        if (sample < -1) sample = -1;
+
+        const value = sample < 0
+          ? sample * 32768
+          : sample * 32767;
+
+        view.setInt16(offset, value, true);
+        offset += 2;
+      }
+    }
+
+    return new Blob([buffer], { type: "audio/wav" });
+  }
+
+  function floatTo16BitPCM(sample) {
+    const s = Math.max(-1, Math.min(1, sample));
+    return s < 0 ? Math.round(s * 32768) : Math.round(s * 32767);
+  }
+
+  // V19: direct classic FFmpeg worker bridge using the multi-thread FFmpeg core.
+  // This avoids @ffmpeg/ffmpeg's classWorkerURL -> new URL(...) chain,
+  // which is the part that can stall when the HTML is opened as file://.
+  const FFMPEG_VERSION = "0.12.15";
+  const CORE_VERSION = "0.12.10";
+  const CORE_PACKAGE = "@ffmpeg/core-mt";
+  let ffmpegInstance = null;
+  let ffmpegLoading = null;
+  let ffmpegCoreBlobUrl = null;
+  let ffmpegWasmBlobUrl = null;
+
+  async function blobUrlFromUrl(url, mimeType) {
+    const response = await fetch(url, { cache: "force-cache" });
+    if (!response.ok) throw new Error("Unable to load FFmpeg component: " + response.status);
+    const blob = await response.blob();
+    return URL.createObjectURL(new Blob([blob], { type: mimeType }));
+  }
+
+  async function createDirectFFmpegWorker() {
+    videoStatus.textContent = "2/4 Preparing FFmpeg worker...";
+    const workerUrl = "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@" + FFMPEG_VERSION + "/dist/esm/worker.js";
+    const response = await fetch(workerUrl, { cache: "force-cache" });
+    if (!response.ok) throw new Error("Unable to load the FFmpeg worker (" + response.status + ").");
+    let workerSource = await response.text();
+
+    // Use the exact v0.12.15 dependency contents, embedded in the worker.
+    const inlineConst = `
+const MIME_TYPE_JAVASCRIPT = "text/javascript";
+const MIME_TYPE_WASM = "application/wasm";
+const CORE_VERSION = "0.12.10";
+  const CORE_PACKAGE = "@ffmpeg/core-mt";
+const CORE_URL = \`https://cdn.jsdelivr.net/npm/${CORE_PACKAGE}@${CORE_VERSION}/dist/umd/ffmpeg-core.js\`;
+const FFMessageType = {
+  LOAD:"LOAD", EXEC:"EXEC", FFPROBE:"FFPROBE", WRITE_FILE:"WRITE_FILE",
+  READ_FILE:"READ_FILE", DELETE_FILE:"DELETE_FILE", RENAME:"RENAME",
+  CREATE_DIR:"CREATE_DIR", LIST_DIR:"LIST_DIR", DELETE_DIR:"DELETE_DIR",
+  ERROR:"ERROR", DOWNLOAD:"DOWNLOAD", PROGRESS:"PROGRESS", LOG:"LOG",
+  MOUNT:"MOUNT", UNMOUNT:"UNMOUNT"
+};
+`;
+    const inlineErrors = `
+const ERROR_UNKNOWN_MESSAGE_TYPE = new Error("unknown message type");
+const ERROR_NOT_LOADED = new Error("ffmpeg is not loaded, call \`await ffmpeg.load()\` first");
+const ERROR_TERMINATED = new Error("called FFmpeg.terminate()");
+const ERROR_IMPORT_FAILURE = new Error("failed to import ffmpeg-core.js");
+`;
+
+    workerSource = workerSource
+      .replace(/import\s*\{\s*CORE_URL\s*,\s*FFMessageType\s*\}\s*from\s*["']\.\/const\.js["']\s*;?/g, inlineConst)
+      .replace(/import\s*\{\s*ERROR_UNKNOWN_MESSAGE_TYPE\s*,\s*ERROR_NOT_LOADED\s*,\s*ERROR_IMPORT_FAILURE\s*,?\s*\}\s*from\s*["']\.\/errors\.js["']\s*;?/g, inlineErrors);
+
+    if (/from ["']\.\/const\.js["']|from ["']\.\/errors\.js["']/.test(workerSource)) {
+      throw new Error("FFmpeg worker dependencies could not be embedded.");
+    }
+    return URL.createObjectURL(new Blob([workerSource], { type: "text/javascript" }));
+  }
+
+  function createDirectFFmpegBridge(worker, coreURL, wasmURL) {
+    let nextId = 1;
+    const pending = new Map();
+    let recentLogs = [];
+
+    worker.onmessage = function (event) {
+      const msg = event.data || {};
+      const id = msg.id;
+      if (msg.type === "LOG") {
+        if (msg.data && msg.data.message) {
+          const line = String(msg.data.message);
+          console.debug("FFmpeg:", line);
+          recentLogs.push(line);
+          if (recentLogs.length > 30) recentLogs.shift();
+        }
+        return;
+      }
+      if (msg.type === "PROGRESS") {
+        if (msg.data && Number.isFinite(msg.data.progress)) {
+          const percent = Math.max(0, Math.min(100, Math.round(msg.data.progress * 100)));
+          videoStatus.textContent = "4/4 Extracting original audio... " + percent + "%";
+        }
+        return;
+      }
+      if (!pending.has(id)) return;
+      const item = pending.get(id);
+      pending.delete(id);
+      if (msg.type === "ERROR") item.reject(new Error(String(msg.data || "FFmpeg worker error.")));
+      else item.resolve(msg.data);
+    };
+
+    worker.onerror = function (event) {
+      const message = event && event.message ? event.message : "FFmpeg worker failed to start. Check browser support for Web Workers and CDN access.";
+      pending.forEach(function (item) { item.reject(new Error(message)); });
+      pending.clear();
+    };
+
+    function send(type, data, transfer) {
+      const id = nextId++;
+      return new Promise(function (resolve, reject) {
+        pending.set(id, { resolve, reject });
+        try { worker.postMessage({ id, type, data }, transfer || []); }
+        catch (error) { pending.delete(id); reject(error); }
+      });
+    }
+
+    return {
+      load: function () { return send("LOAD", { coreURL: coreURL, wasmURL: wasmURL }); },
+      createDir: function (path) { return send("CREATE_DIR", { path: path }); },
+      mount: function (fsType, options, mountPoint) { return send("MOUNT", { fsType: fsType, options: options, mountPoint: mountPoint }); },
+      unmount: function (mountPoint) { return send("UNMOUNT", { mountPoint: mountPoint }); },
+      exec: function (args) { return send("EXEC", { args: args, timeout: -1 }); },
+      ffprobe: function (args) { return send("FFPROBE", { args: args }); },
+      readFile: function (path) { return send("READ_FILE", { path: path, encoding: "binary" }); },
+      deleteFile: function (path) { return send("DELETE_FILE", { path: path }); },
+      listDir: function (path) { return send("LIST_DIR", { path: path }); },
+      getRecentLogs: function () { return recentLogs.slice(); }
+    };
+  }
+
+  async function loadFFmpeg() {
+    if (ffmpegInstance) return ffmpegInstance;
+    if (ffmpegLoading) return ffmpegLoading;
+    ffmpegLoading = (async function () {
+      if (!(window.crossOriginIsolated === true && typeof SharedArrayBuffer !== "undefined")) {
+        throw new Error("Multi-thread FFmpeg is not active. Open the GitHub Pages URL and reload the page once.");
+      }
+      videoStatus.textContent = "1/4 Loading FFmpeg components...";
+      const workerBlobUrl = await createDirectFFmpegWorker();
+      videoStatus.textContent = "3/4 Loading FFmpeg multi-thread core...";
+      const baseURL = "https://cdn.jsdelivr.net/npm/" + CORE_PACKAGE + "@" + CORE_VERSION + "/dist/umd";
+
+      // IMPORTANT: do NOT turn the core into a blob URL here.
+      // The classic FFmpeg worker uses importScripts(coreURL). A blob:null
+      // core URL can make importScripts fail on file:// pages and then the
+      // worker falls back to dynamic import(), which is exactly the error
+      // seen in the previous test. jsDelivr serves the core with CORS, so
+      // the classic worker can import it directly.
+      ffmpegCoreBlobUrl = baseURL + "/ffmpeg-core.js";
+      ffmpegWasmBlobUrl = baseURL + "/ffmpeg-core.wasm";
+
+      videoStatus.textContent = "3/4 Starting FFmpeg multi-thread engine...";
+      const worker = new Worker(workerBlobUrl);
+      const bridge = createDirectFFmpegBridge(worker, ffmpegCoreBlobUrl, ffmpegWasmBlobUrl);
+      await Promise.race([
+        bridge.load(),
+        new Promise(function (_, reject) {
+          setTimeout(function () { reject(new Error("FFmpeg engine did not start. Please try again.")); }, 90000);
+        })
+      ]);
+      ffmpegInstance = bridge;
+      videoStatus.textContent = "FFmpeg ready ✓";
+      return bridge;
+    })().catch(function (error) {
+      ffmpegLoading = null;
+      throw error;
+    });
+    return ffmpegLoading;
+  }
+
+  async function extractOriginalAudioWithFFmpeg(file) {
+    const ffmpeg = await loadFFmpeg();
+    let inputPath = "";
+    let outputPath = "";
+
+    try {
+      videoStatus.textContent = "Preparing FFmpeg input...";
+      await ffmpeg.createDir("/input").catch(function () {});
+      await ffmpeg.mount("WORKERFS", { files: [file] }, "/input");
+
+      const nodes = await ffmpeg.listDir("/input");
+      const realFile = nodes.find(function (node) {
+        return node && node.name && node.name !== "." && node.name !== ".." && !node.isDir;
+      });
+      if (!realFile) throw new Error("FFmpeg could not see the selected video.");
+
+      inputPath = "/input/" + realFile.name;
+      videoStatus.textContent = "Detecting original audio codec...";
+
+      // ffprobe only inspects the first audio stream; it does not re-encode anything.
+      const probe = await ffmpeg.ffprobe([
+        "-v", "error",
+        "-select_streams", "a:0",
+        "-show_entries", "stream=codec_name",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        inputPath
+      ]);
+      const codec = String(probe || "").trim().split(/\s+/)[0].toLowerCase();
+      if (!codec) throw new Error("Could not detect the original audio codec.");
+
+      const map = {
+        mp3:  { ext: "mp3",  mux: "mp3",  mime: "audio/mpeg" },
+        aac:  { ext: "m4a",  mux: "ipod", mime: "audio/mp4" },
+        alac: { ext: "m4a",  mux: "ipod", mime: "audio/mp4" },
+        ac3:  { ext: "ac3",  mux: "ac3",  mime: "audio/ac3" },
+        eac3: { ext: "eac3", mux: "eac3", mime: "audio/eac3" },
+        flac: { ext: "flac", mux: "flac", mime: "audio/flac" },
+        opus: { ext: "opus", mux: "ogg",  mime: "audio/ogg" },
+        vorbis:{ ext: "ogg", mux: "ogg",  mime: "audio/ogg" },
+        pcm_s16le: { ext: "wav", mux: "wav", mime: "audio/wav" },
+        pcm_s24le: { ext: "wav", mux: "wav", mime: "audio/wav" },
+        pcm_s32le: { ext: "wav", mux: "wav", mime: "audio/wav" },
+        pcm_f32le: { ext: "wav", mux: "wav", mime: "audio/wav" }
+      };
+      const target = map[codec] || { ext: "mka", mux: "matroska", mime: "audio/x-matroska" };
+      outputPath = "/original-audio." + target.ext;
+
+      videoStatus.textContent = "Extracting original audio (" + codec.toUpperCase() + ")... 0%";
+
+      const exitCode = await ffmpeg.exec([
+        "-nostdin",
+        "-y",
+        "-i", inputPath,
+        "-map", "0:a:0",
+        "-vn",
+        "-sn",
+        "-dn",
+        "-c:a", "copy",
+        "-map_metadata", "0",
+        "-f", target.mux,
+        outputPath
+      ]);
+
+      if (exitCode !== 0) {
+        const logs = ffmpeg.getRecentLogs().slice(-10).join(" | ");
+        throw new Error("FFmpeg could not extract the original audio." + (logs ? " Details: " + logs : ""));
+      }
+
+      const data = await ffmpeg.readFile(outputPath);
+      if (!data || !data.length) throw new Error("FFmpeg created an empty audio file.");
+
+      const baseName = file.name.replace(/\.[^/.]+$/, "") || "extracted-audio";
+      downloadAudio(new Blob([data], { type: target.mime }), baseName + "-original-audio." + target.ext);
+      videoStatus.textContent = "Original audio extracted ✓ (" + codec.toUpperCase() + ", no re-encoding)";
+    } finally {
+      if (outputPath) { try { await ffmpeg.deleteFile(outputPath); } catch (e) {} }
+      try { await ffmpeg.unmount("/input"); } catch (e) {}
+    }
+  }
+
+  extractAudioButton.addEventListener("click", async function () {
+    if (!selectedVideo) {
+      videoStatus.textContent = "Please choose a video first.";
+      return;
+    }
+
+    extractAudioButton.disabled = true;
+    videoClearButton.disabled = true;
+    audioDownloadArea.innerHTML = "";
+    videoStatus.textContent = "Extracting original audio...";
+
+    try {
+      await extractOriginalAudioWithFFmpeg(selectedVideo);
+    } catch (error) {
+      videoStatus.textContent =
+        error && error.message ? error.message : "Audio extraction failed.";
+    } finally {
+      extractAudioButton.disabled = false;
+      videoClearButton.disabled = false;
+    }
+  });
+
+  imageConverterButton.addEventListener("click", function () {
+    dashboard.classList.add("hidden");
+    textPage.classList.add("hidden");
+    imageConverterPage.classList.remove("hidden");
+  });
+
+  imageBackButton.addEventListener("click", function () {
+    imageConverterPage.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+  });
+
+  chooseImageButton.addEventListener("click", function () {
+    imageFileInput.click();
+  });
+
+  takePhotoButton.addEventListener("click", function () {
+    cameraInput.click();
+  });
+
+  function handleImages(fileList) {
+    selectedImages = Array.from(fileList).filter(function (file) {
+      return file.type.startsWith("image/");
+    });
+
+    renderPreview();
+    downloadArea.innerHTML = "";
+    imageStatus.textContent = selectedImages.length
+      ? selectedImages.length + " image(s) selected."
+      : "No valid image selected.";
+  }
+
+  imageFileInput.addEventListener("change", function () {
+    handleImages(imageFileInput.files);
+  });
+
+  cameraInput.addEventListener("change", function () {
+    handleImages(cameraInput.files);
+  });
+
+  function renderPreview() {
+    if (!selectedImages.length) {
+      imagePreview.textContent = "No image selected.";
+      return;
+    }
+
+    imagePreview.innerHTML = "";
+    const grid = document.createElement("div");
+    grid.className = "preview-grid";
+
+    selectedImages.forEach(function (file) {
+      const item = document.createElement("div");
+      item.className = "preview-item";
+
+      const img = document.createElement("img");
+      img.alt = file.name;
+      img.src = URL.createObjectURL(file);
+
+      const name = document.createElement("div");
+      name.className = "preview-name";
+      name.textContent = file.name;
+
+      item.appendChild(img);
+      item.appendChild(name);
+      grid.appendChild(item);
+    });
+
+    imagePreview.appendChild(grid);
+  }
+
+  imageClearButton.addEventListener("click", function () {
+    selectedImages = [];
+    imageFileInput.value = "";
+    cameraInput.value = "";
+    imagePreview.textContent = "No image selected.";
+    imageStatus.textContent = "";
+    downloadArea.innerHTML = "";
+  });
+
+  function createDownload(blob, filename) {
+    downloadArea.innerHTML = "";
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.className = "download-link";
+    link.href = url;
+    link.download = filename;
+    link.textContent = "⬇️ Download " + filename;
+    downloadArea.appendChild(link);
+  }
+
+  function canvasBlob(image, type, quality) {
+    return new Promise(function (resolve) {
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const ctx = canvas.getContext("2d");
+
+      if (type === "image/jpeg") {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      ctx.drawImage(image, 0, 0);
+      canvas.toBlob(resolve, type, quality);
+    });
+  }
+
+
+  function loadImageFromFile(file) {
+    return new Promise(function (resolve, reject) {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+
+      image.onload = function () {
+        URL.revokeObjectURL(url);
+        resolve(image);
+      };
+
+      image.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error("Unable to read image."));
+      };
+
+      image.src = url;
+    });
+  }
+
+  function escapePdfText(text) {
+    return text
+      .replace(/\\/g, "\\\\")
+      .replace(/\(/g, "\\(")
+      .replace(/\)/g, "\\)");
+  }
+
+  function createImagePDF(files) {
+    return new Promise(async function (resolve, reject) {
+      try {
+        const pageWidth = 595.28;
+        const pageHeight = 841.89;
+        const margin = 28;
+        const objects = [];
+        const pageRefs = [];
+        let nextObject = 4;
+
+        for (let i = 0; i < files.length; i++) {
+          const image = await loadImageFromFile(files[i]);
+
+          const maxWidth = pageWidth - margin * 2;
+          const maxHeight = pageHeight - margin * 2;
+
+          const scale = Math.min(
+            maxWidth / image.naturalWidth,
+            maxHeight / image.naturalHeight,
+            1
+          );
+
+          const drawWidth = image.naturalWidth * scale;
+          const drawHeight = image.naturalHeight * scale;
+          const x = (pageWidth - drawWidth) / 2;
+          const y = (pageHeight - drawHeight) / 2;
+
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(drawWidth));
+          canvas.height = Math.max(1, Math.round(drawHeight));
+
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+          const jpegDataUrl = canvas.toDataURL("image/jpeg", 0.92);
+          const base64 = jpegDataUrl.split(",")[1];
+          const binary = atob(base64);
+          const imageBytes = new Uint8Array(binary.length);
+
+          for (let j = 0; j < binary.length; j++) {
+            imageBytes[j] = binary.charCodeAt(j);
+          }
+
+          const imageObject = nextObject++;
+          const contentObject = nextObject++;
+          const pageObject = nextObject++;
+
+          const content =
+            "q\n" +
+            drawWidth.toFixed(2) + " 0 0 " +
+            drawHeight.toFixed(2) + " " +
+            x.toFixed(2) + " " +
+            y.toFixed(2) + " cm\n" +
+            "/Im" + i + " Do\nQ";
+
+          objects.push({
+            number: imageObject,
+            bytes: imageBytes,
+            type: "image"
+          });
+
+          objects.push({
+            number: contentObject,
+            text: "<< /Length " + content.length + " >>\nstream\n" +
+                  content + "\nendstream"
+          });
+
+          objects.push({
+            number: pageObject,
+            text:
+              "<< /Type /Page /Parent 2 0 R " +
+              "/MediaBox [0 0 " + pageWidth + " " + pageHeight + "] " +
+              "/Resources << /XObject << /Im" + i + " " +
+              imageObject + " 0 R >> >> " +
+              "/Contents " + contentObject + " 0 R >>"
+          });
+
+          pageRefs.push(pageObject + " 0 R");
+        }
+
+        const pagesObject =
+          "<< /Type /Pages /Kids [" + pageRefs.join(" ") +
+          "] /Count " + pageRefs.length + " >>";
+
+        const catalogObject =
+          "<< /Type /Catalog /Pages 2 0 R >>";
+
+        const pdfParts = [];
+        const offsets = [];
+        let length = 0;
+
+        function addPart(text) {
+          const bytes = new TextEncoder().encode(text);
+          pdfParts.push(bytes);
+          length += bytes.length;
+        }
+
+        addPart("%PDF-1.4\n");
+
+        const allObjects = [
+          { number: 1, text: catalogObject },
+          { number: 2, text: pagesObject },
+          { number: 3, text: "<< /Producer (Soft Week File Toolbox) /Type /Info >>" },
+          ...objects
+        ].sort(function (a, b) {
+          return a.number - b.number;
+        });
+
+        allObjects.forEach(function (obj) {
+          offsets[obj.number] = length;
+
+          if (obj.type === "image") {
+            const header = obj.number + " 0 obj\n" +
+              "<< /Type /XObject /Subtype /Image " +
+              "/Width " + Math.round(obj.width || 0) +
+              " /Height " + Math.round(obj.height || 0) +
+              " /ColorSpace /DeviceRGB /BitsPerComponent 8 " +
+              "/Filter /DCTDecode /Length " + obj.bytes.length +
+              " >>\nstream\n";
+
+            // Width/height are recovered from the corresponding canvas data
+            // by reading JPEG dimensions below if necessary.
+            const marker = findJpegSize(obj.bytes);
+            const correctedHeader = obj.number + " 0 obj\n" +
+              "<< /Type /XObject /Subtype /Image " +
+              "/Width " + marker.width +
+              " /Height " + marker.height +
+              " /ColorSpace /DeviceRGB /BitsPerComponent 8 " +
+              "/Filter /DCTDecode /Length " + obj.bytes.length +
+              " >>\nstream\n";
+
+            addPart(correctedHeader);
+            pdfParts.push(obj.bytes);
+            length += obj.bytes.length;
+            addPart("\nendstream\nendobj\n");
+          } else {
+            addPart(obj.number + " 0 obj\n" + obj.text + "\nendobj\n");
+          }
+        });
+
+        const xrefOffset = length;
+        addPart(
+          "xref\n0 " + (allObjects.length + 1) + "\n" +
+          "0000000000 65535 f \n"
+        );
+
+        for (let i = 1; i <= allObjects.length; i++) {
+          addPart(String(offsets[i]).padStart(10, "0") + " 00000 n \n");
+        }
+
+        addPart(
+          "trailer\n<< /Size " + (allObjects.length + 1) +
+          " /Root 1 0 R /Info 3 0 R >>\n" +
+          "startxref\n" + xrefOffset + "\n%%EOF"
+        );
+
+        resolve(new Blob(pdfParts, { type: "application/pdf" }));
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  function findJpegSize(bytes) {
+    let offset = 2;
+
+    while (offset < bytes.length) {
+      if (bytes[offset] !== 0xFF) {
+        offset++;
+        continue;
+      }
+
+      const marker = bytes[offset + 1];
+
+      if (
+        marker >= 0xC0 &&
+        marker <= 0xC3
+      ) {
+        const height = (bytes[offset + 5] << 8) | bytes[offset + 6];
+        const width = (bytes[offset + 7] << 8) | bytes[offset + 8];
+        return { width: width, height: height };
+      }
+
+      const segmentLength = (bytes[offset + 2] << 8) | bytes[offset + 3];
+      offset += 2 + segmentLength;
+    }
+
+    return { width: 1, height: 1 };
+  }
+
+  imageConvertButton.addEventListener("click", async function () {
+    if (!selectedImages.length) {
+      imageStatus.textContent = "Please select an image first.";
+      return;
+    }
+
+    const target = formatSelect.value;
+
+    if (target === "pdf") {
+      imageStatus.textContent = "Creating PDF...";
+      try {
+        const pdfBlob = await createImagePDF(selectedImages);
+        createDownload(pdfBlob, "converted-images.pdf");
+        imageStatus.textContent = "PDF conversion completed ✓";
+      } catch (error) {
+        imageStatus.textContent = "PDF conversion failed.";
+      }
+      return;
+    }
+
+    if (selectedImages.length > 1) {
+      imageStatus.textContent = "For JPG, PNG and WebP, please select one image at a time.";
+      return;
+    }
+
+    const file = selectedImages[0];
+    const image = new Image();
+
+    image.onload = async function () {
+      let mime = "image/jpeg";
+      let extension = "jpg";
+
+      if (target === "png") {
+        mime = "image/png";
+        extension = "png";
+      } else if (target === "webp") {
+        mime = "image/webp";
+        extension = "webp";
+      }
+
+      const blob = await canvasBlob(image, mime, target === "jpg" ? 0.92 : undefined);
+
+      if (!blob) {
+        imageStatus.textContent = "Conversion failed.";
+        return;
+      }
+
+      const baseName = file.name.replace(/\.[^/.]+$/, "") || "converted-image";
+      const filename = baseName + "." + extension;
+
+      createDownload(blob, filename);
+      imageStatus.textContent = "Conversion completed ✓";
+    };
+
+    image.onerror = function () {
+      imageStatus.textContent = "The selected image could not be read.";
+    };
+
+    image.src = URL.createObjectURL(file);
+  });
+
+
+  openButton.addEventListener("click", function () {
+    dashboard.classList.add("hidden");
+    textPage.classList.remove("hidden");
+    textInput.focus();
+  });
+
+  backButton.addEventListener("click", function () {
+    textPage.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+  });
+
+  clearButton.addEventListener("click", function () {
+    textInput.value = "";
+    status.textContent = "Text area cleared.";
+    textInput.focus();
+  });
+
+  convertButton.addEventListener("click", function () {
+    const text = textInput.value;
+
+    if (!text.trim()) {
+      status.textContent = "Please write some text before converting.";
+      textInput.focus();
+      return;
+    }
+
+    const lines = text.split("\n");
+    const escapedLines = lines.map(function (line) {
+      return line
+        .replace(/\\/g, "\\\\")
+        .replace(/\(/g, "\\(")
+        .replace(/\)/g, "\\)");
+    });
+
+    const pageWidth = 595;
+    const pageHeight = 842;
+    const margin = 50;
+    const fontSize = 12;
+    const lineHeight = 18;
+    const maxChars = 82;
+    const linesPerPage = 40;
+
+    const wrapped = [];
+
+    escapedLines.forEach(function (line) {
+      if (line.length === 0) {
+        wrapped.push("");
+        return;
+      }
+
+      let remaining = line;
+      while (remaining.length > maxChars) {
+        let cut = remaining.lastIndexOf(" ", maxChars);
+        if (cut <= 0) cut = maxChars;
+        wrapped.push(remaining.slice(0, cut));
+        remaining = remaining.slice(cut).replace(/^ /, "");
+      }
+      wrapped.push(remaining);
+    });
+
+    const pages = [];
+    for (let i = 0; i < wrapped.length; i += linesPerPage) {
+      pages.push(wrapped.slice(i, i + linesPerPage));
+    }
+
+    const objects = [];
+    const pageObjectNumbers = [];
+    const contentObjectNumbers = [];
+
+    pages.forEach(function (pageLines) {
+      const pageNum = 3 + objects.length;
+      pageObjectNumbers.push(pageNum);
+
+      const commands = [
+        "BT",
+        "/F1 " + fontSize + " Tf",
+        margin + " " + (pageHeight - margin - fontSize) + " Td"
+      ];
+
+      pageLines.forEach(function (line, index) {
+        if (index > 0) commands.push("0 -" + lineHeight + " Td");
+        commands.push("(" + line + ") Tj");
+      });
+
+      commands.push("ET");
+      const content = commands.join("\n");
+      const contentNum = pageNum + 1;
+      contentObjectNumbers.push(contentNum);
+
+      objects.push({ num: pageNum, text: "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + pageWidth + " " + pageHeight + "] /Resources << /Font << /F1 1 0 R >> >> /Contents " + contentNum + " 0 R >>" });
+      objects.push({ num: contentNum, text: "<< /Length " + content.length + " >>\nstream\n" + content + "\nendstream" });
+    });
+
+    const kids = pageObjectNumbers.map(function (n) {
+      return n + " 0 R";
+    }).join(" ");
+
+    objects.unshift({
+      num: 2,
+      text: "<< /Type /Pages /Kids [" + kids + "] /Count " + pageObjectNumbers.length + " >>"
+    });
+
+    objects.unshift({
+      num: 1,
+      text: "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"
+    });
+
+    objects.unshift({
+      num: 3,
+      text: "<< /Type /Catalog /Pages 2 0 R >>"
+    });
+
+    // Renumber objects sequentially and rebuild references.
+    const pageCount = pages.length;
+    const pdfObjects = [];
+
+    pdfObjects.push("<< /Type /Catalog /Pages 2 0 R >>");
+    pdfObjects.push("<< /Type /Pages /Kids [" +
+      Array.from({length: pageCount}, function (_, i) {
+        return (4 + i * 2) + " 0 R";
+      }).join(" ") +
+      "] /Count " + pageCount + " >>");
+    pdfObjects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+
+    pages.forEach(function (pageLines, pageIndex) {
+      const pageNum = 4 + pageIndex * 2;
+      const contentNum = pageNum + 1;
+
+      const commands = [
+        "BT",
+        "/F1 " + fontSize + " Tf",
+        margin + " " + (pageHeight - margin - fontSize) + " Td"
+      ];
+
+      pageLines.forEach(function (line, index) {
+        if (index > 0) commands.push("0 -" + lineHeight + " Td");
+        commands.push("(" + line + ") Tj");
+      });
+
+      commands.push("ET");
+      const content = commands.join("\n");
+
+      pdfObjects.push(
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " +
+        pageWidth + " " + pageHeight +
+        "] /Resources << /Font << /F1 3 0 R >> >> /Contents " +
+        contentNum + " 0 R >>"
+      );
+
+      pdfObjects.push(
+        "<< /Length " + content.length + " >>\nstream\n" +
+        content + "\nendstream"
+      );
+    });
+
+    let pdf = "%PDF-1.4\n";
+    const offsets = [0];
+
+    pdfObjects.forEach(function (obj, index) {
+      offsets[index + 1] = pdf.length;
+      pdf += (index + 1) + " 0 obj\n" + obj + "\nendobj\n";
+    });
+
+    const xref = pdf.length;
+    pdf += "xref\n0 " + (pdfObjects.length + 1) + "\n";
+    pdf += "0000000000 65535 f \n";
+
+    for (let i = 1; i <= pdfObjects.length; i++) {
+      pdf += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+    }
+
+    pdf += "trailer\n<< /Size " + (pdfObjects.length + 1) + " /Root 1 0 R >>\n";
+    pdf += "startxref\n" + xref + "\n%%EOF";
+
+    const blob = new Blob([pdf], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "text-to-pdf.pdf";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    status.textContent = "PDF created successfully.";
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+    }, 1000);
+  });
+})();
+</script>
+
+</body>
+</html>
